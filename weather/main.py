@@ -33,16 +33,10 @@ def getweather(lat, long):
 st.title("Weather Dashboard")
 
 geolocator = Nominatim(user_agent="Streamlit")
-def updatetext():
-    pass
-
-def updatelatlong():
-    pass
     
 placechoice = st.text_input("Enter Location", key="keytext")
-mylocation = geolocator.geocode(placechoice)
 
-
+mylocation = geolocator.geocode(placechoice) # Using Nominatim to get lat/long coords from Location
 
 choice1 = st.number_input('Latitude', min_value = -85, max_value = 85, key="keylat")
 choice2 = st.number_input('Longitude', min_value = -180, max_value = 179, key="keylong")
@@ -53,8 +47,6 @@ if placechoice:
 
 data = getweather(choice1, choice2)
 location = data["features"][0]["properties"]["location"]["name"]
-
-
 timeSeries0 = data["features"][0]["properties"]["timeSeries"][0]
 alltimeseries = data["features"][0]["properties"]["timeSeries"]
 
