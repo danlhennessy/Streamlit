@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 st.title("Stocks Price Web App")
 
 st.markdown("""
-            This app retrieves data from Wikipedia of the top 500 S&P, and displays the closing price in a Pandas dataframe
+            This app retrieves data from Wikipedia of the top 500 S&P, then pulls closing price data for selected ticker symbol using the yfinance module, and displays it in an streamlit area graph.
             * **Data Source:** [Wikipedia](https://www.Wikipedia.org)
             """)
 
@@ -33,7 +33,7 @@ data = yf.download(  # or pdr.get_data_yahoo(...
         # fetch data by interval (including intraday if period < 60 days)
         # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
         # (optional, default is '1d')
-        interval = "5d",
+        interval = "1d",
 
         # group by ticker (to access via data['SPY'])
         # (optional, default is 'column')
@@ -56,7 +56,7 @@ data = yf.download(  # or pdr.get_data_yahoo(...
         proxy = None
     )
 
-choice = st.selectbox("Choose a company to show close prices for this year to date", list(df.Symbol))
+choice = st.selectbox("Choose a company to show close prices for this year to date", sorted(list(df.Symbol)))
 
 closedf = pd.DataFrame(data[choice].Close)
 closedf
