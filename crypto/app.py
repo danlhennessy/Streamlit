@@ -1,12 +1,13 @@
-from soupsieve import select_one
 import streamlit as st
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup as bs
+import numpy as np
+import matplotlib.pyplot as plt
 
 st.title("Crypto Dashboard")
 
-st.markdown("""Data from https://crypto.com/price  
+st.markdown("""Data from https://crypto.com/price and https://uk.investing.com  
     Modules used: **Streamlit, Requests, Pandas, BS4**
             """)
 
@@ -45,8 +46,8 @@ df
 
 #Chart showing coin price history for selected coin
 
-coin = "bitcoin"
-newurl = f"https://uk.investing.com/crypto/{coin}/historical-data"
+coin =  st.selectbox("Coin", coinnames, index=0)
+newurl = f"https://uk.investing.com/crypto/{coin.lower()}/historical-data"
 # Request
 header = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36","X-Requested-With": "XMLHttpRequest"}
 r2 = requests.get(newurl)
@@ -59,9 +60,13 @@ for v in testdf["Date"]:
     histdate.append(v)
 for v in testdf["Open"]:
     histopen.append(v)
-df2 = pd.DataFrame(histopen, histdate)
-tab1, tab2 = st.tabs(["Dataframe", "Area Chart"])
+df2 = pd.DataFrame({"Date" : histdate, "type" : histopen})
+tab1, tab2 = st.tabs(["Area Chart", "Raw data"])
+
+
+
 with tab1:
-    df2
+    print("Hi")
 with tab2:
-    st.area_chart(df2)
+    df2
+    
