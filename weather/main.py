@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import streamlit as st
 from geopy.geocoders import Nominatim
+import pandas as pd
 
 #Loading .env file
 def configure():
@@ -32,18 +33,21 @@ def getweather(lat, long):
 
 st.title("Weather Dashboard")
 
+check = st.sidebar.checkbox("Use Custom Latitude/Longitude")
+
 geolocator = Nominatim(user_agent="Streamlit")
-    
-placechoice = st.text_input("Enter Location", key="keytext")
 
-mylocation = geolocator.geocode(placechoice) # Using Nominatim to get lat/long coords from Location
+if not check:    
+    placechoice = st.text_input("Enter Location", key="keytext", value="London")
 
-choice1 = st.number_input('Latitude', min_value = -85, max_value = 85, key="keylat")
-choice2 = st.number_input('Longitude', min_value = -180, max_value = 179, key="keylong")
-
-if placechoice:
+    mylocation = geolocator.geocode(placechoice) # Using Nominatim to get lat/long coords from Location
     choice1 = mylocation.latitude
     choice2 = mylocation.longitude
+
+if check:
+    choice1 = st.number_input('Latitude', min_value = -85, max_value = 85, key="keylat")
+    choice2 = st.number_input('Longitude', min_value = -180, max_value = 179, key="keylong")
+    
 
 data = getweather(choice1, choice2)
 location = data["features"][0]["properties"]["location"]["name"]
@@ -57,19 +61,27 @@ with col2:
 st.header(f"48 Hour Forecast")
 col1, col2, col3, col4 = st.columns(4)
 
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
 def get48hrforecast():
+    tdate = timeSeries0["time"][:10]
+    dof = pd.Timestamp(tdate)
     temp1, temp2, temp3 = timeSeries0["feelsLikeTemp"], timeSeries0["windSpeed10m"], timeSeries0["probOfRain"]
-    col1.metric(timeSeries0["time"][:10], timeSeries0["time"][11:-1])
+    col1.metric(days[dof.dayofweek], timeSeries0["time"][11:-1])
     col2.metric("Temperature", f'{temp1} °C')
     col3.metric("Windspeed", f'{temp2} mph')
     col4.metric("Rain Probability", f'{temp3}%')
     
     for v in alltimeseries[1:16]:
+        tdate = v["time"][:10]
+        dof = pd.Timestamp(tdate)
         tm, t, w, r = v["time"], v["feelsLikeTemp"], v["windSpeed10m"], v["probOfRain"]
-        col1.metric(tm[:10], tm[11:-1], "3", delta_color="off")
-        col2.metric("Temperature", f'{t} °C', round(t - temp1, 2))
-        col3.metric("Windspeed", f'{w} mph', round(w - temp2, 2))
-        col4.metric("Rain Probability", f'{r}%', round(r - temp3, 2))
+        col1.metric(days[dof.dayofweek], tm[11:-1], tm[:10], delta_color="off")
+        col2.metric("Temperature", f'{t} °C', f"{round(t - temp1, 2)} °C" )
+        col3.metric("Windspeed", f'{w} mph', f"{round(w - temp2, 2)} mph")
+        col4.metric("Rain Probability", f'{r}%', f"{round(r - temp3, 2)} %")
         temp1, temp2, temp3 = t, w, r
         
 get48hrforecast()
+
+
