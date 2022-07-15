@@ -64,7 +64,7 @@ timeSeries0 = data["features"][0]["properties"]["timeSeries"][0]
 alltimeseries = data["features"][0]["properties"]["timeSeries"]
 
 def scrapeimage():
-    url = f'https://www.weather-forecast.com/locations/{location}/forecasts/latest'
+    url = f'https://www.theweatheroutlook.com/forecast/uk/{location}'
     header = {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest"
@@ -74,6 +74,7 @@ def scrapeimage():
     soup = bs(r.content, "html.parser")
     for img in soup.find_all('img'):
         urls.append(img.get('src'))
+    urls
         
 # Formatting page to display metrics
 col1,col2,col3 = st.columns(3)
