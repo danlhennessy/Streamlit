@@ -14,15 +14,18 @@ header = {
 }
 r = requests.get(url, headers=header)
 
-# BS Scraping:
-
-
 html = pd.read_html(r.text)
 df = html[0] # Set dataframe to be the first table if multiple on page
-df = df.drop(df.columns[[0, 1]], axis=1)
+df = df.drop(df.columns[[0,1,2,7,8]], axis=1)
+
+# BS Scraping:
+soup = bs(r.content, "html.parser")
+coinnames = []
+mydivs = soup.find_all("a", {"class": "chakra-text css-o2rp9n"})
+for v in mydivs:
+    coinnames.append(v.text)
+
+df.insert(0, "Name", coinnames)
 df
     
-def webtoDF(url):
-    pass
-#webtoDF("https://coinmarketcap.com/")
 
