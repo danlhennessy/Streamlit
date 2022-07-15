@@ -1,11 +1,13 @@
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
 
 url = 'https://www.allsides.com/media-bias/media-bias-ratings'
-
-r = requests.get(url)
-
-soup = BeautifulSoup(r.content, "html.parser")
+header = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
+    "X-Requested-With": "XMLHttpRequest"
+    }
+r = requests.get(url, headers=header)
+soup = bs(r.content, "html.parser")
 
 #select_one('body') gets the body element
 #select_one('.temp') to get <a class="temp"></a>
