@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 st.title("Crypto Dashboard")
 
-st.markdown("""Data from https://crypto.com/price and https://uk.investing.com  
+st.markdown("""Data from https://crypto.com and https://uk.investing.com  
     Modules used: **Streamlit, Requests, Pandas, BS4**
             """)
 
@@ -42,16 +42,16 @@ df.insert(1, "Price ($)", prices)
 df = df.astype(str)
 df
 
-# Add more visuals in streamlit,new tools
-
 #Chart showing coin price history for selected coin
+
 
 coin =  st.selectbox("Coin", coinnames, index=0)
 newurl = f"https://uk.investing.com/crypto/{coin.lower()}/historical-data"
-# Request
 header = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36","X-Requested-With": "XMLHttpRequest"}
 r2 = requests.get(newurl)
 soup2 = bs(r2.content, "html.parser")
+imgdiv = soup2.select_one('.left.cryptoCurrentData')
+st.image(imgdiv.find('img').attrs['src'])
 html = pd.read_html(r2.text)
 testdf = html[0]
 histdate = []
@@ -60,16 +60,16 @@ for v in testdf["Date"]:
     histdate.append(v)
 for v in testdf["Open"]:
     histopen.append(v)
-df2 = pd.DataFrame({"Date" : histdate, "Open Price" : histopen})
+df2 = pd.DataFrame({"Date" : histdate, "Open Price ($)" : histopen})
 df2.Date = pd.to_datetime(df2.Date) # Convert Date Column to datetime from string
 df2.set_index("Date", inplace=True) # Set Date to be index
-df2
+
+#Display Data
 tab1, tab2 = st.tabs(["Area Chart", "Raw data"])
-
-
-
 with tab1:
-    st.area_chart(df2["Open Price"])
+    st.area_chart(df2["Open Price ($)"])
 with tab2:
     df2
-    
+
+
+
