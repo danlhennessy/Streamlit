@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup as bs
 
 st.title("Crypto Dashboard")
 
+toggle = st.sidebar.checkbox("Hide Historical Data")
+
+
 st.markdown("""Data from https://crypto.com and https://uk.investing.com  
     Modules used: **Streamlit, Requests, Pandas, BS4**
             """)
@@ -69,11 +72,12 @@ df2.Date = pd.to_datetime(df2.Date) # Convert Date Column to datetime from strin
 df2.set_index("Date", inplace=True) # Set Date to be index
 
 #Display Data
-tab1, tab2 = st.tabs(["Area Chart", "Raw data"])
-with tab1:
-    st.area_chart(df2["Open Price ($)"])
-with tab2:
-    df2
+if not toggle:
+    tab1, tab2 = st.tabs(["Area Chart", "Raw data"])
+    with tab1:
+        st.area_chart(df2["Open Price ($)"])
+    with tab2:
+        df2
 
 
 
