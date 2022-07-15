@@ -60,13 +60,16 @@ for v in testdf["Date"]:
     histdate.append(v)
 for v in testdf["Open"]:
     histopen.append(v)
-df2 = pd.DataFrame({"Date" : histdate, "type" : histopen})
+df2 = pd.DataFrame({"Date" : histdate, "Open Price" : histopen})
+df2.Date = pd.to_datetime(df2.Date) # Convert Date Column to datetime from string
+df2.set_index("Date", inplace=True) # Set Date to be index
+df2
 tab1, tab2 = st.tabs(["Area Chart", "Raw data"])
 
 
 
 with tab1:
-    print("Hi")
+    st.area_chart(df2["Open Price"])
 with tab2:
     df2
     
