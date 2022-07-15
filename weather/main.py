@@ -33,6 +33,11 @@ def getweather(lat, long):
 
 st.title("Weather Dashboard")
 
+st.sidebar.markdown("""Pulling Info from Met Office Weather Datahub service via API and webpage using BeautifulSoup module. https://www.metoffice.gov.uk/services/data/met-office-weather-datahub
+            
+            
+            """)
+
 check = st.sidebar.checkbox("Use Custom Latitude/Longitude")
 
 geolocator = Nominatim(user_agent="Streamlit")
