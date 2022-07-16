@@ -116,7 +116,7 @@ def get48hrforecast():
     tdate = timeSeries0["time"][:10]
     dof = pd.Timestamp(tdate)
     temp1, temp2, temp3 = timeSeries0["feelsLikeTemp"], timeSeries0["windSpeed10m"], timeSeries0["probOfRain"]
-    if ansbox is not None:
+    if ansbox is not None: # If google has a forecast image for location
         col1.image(ansbox["thumbnail"], width=91)
     col2.metric(days[dof.dayofweek], timeSeries0["time"][11:-1])
     col3.metric("Temperature", f'{temp1} °C')
@@ -128,7 +128,7 @@ def get48hrforecast():
         tm, t, w, r = v["time"], v["feelsLikeTemp"], v["windSpeed10m"], v["probOfRain"]
         tdate = v["time"][:10]
         dof = pd.Timestamp(tdate)
-        if ansbox:
+        if ansbox: 
             if days[dof.dayofweek] == curday: # If still on todays date show todays forecast image
                 col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
             else: # If date does not match todays date, move to next forecast image
