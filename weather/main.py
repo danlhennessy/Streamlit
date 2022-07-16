@@ -5,9 +5,7 @@ import os
 import streamlit as st
 from geopy.geocoders import Nominatim
 import pandas as pd
-from bs4 import BeautifulSoup as bs
-import requests
-import re
+from serpapi import GoogleSearch
 
 #Loading .env file
 def configure():
@@ -63,18 +61,8 @@ location = data["features"][0]["properties"]["location"]["name"]
 timeSeries0 = data["features"][0]["properties"]["timeSeries"][0]
 alltimeseries = data["features"][0]["properties"]["timeSeries"]
 
-def scrapeimage():
-    url = f'https://www.theweatheroutlook.com/forecast/uk/{location}'
-    header = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
-        "X-Requested-With": "XMLHttpRequest"
-        }
-    urls = [] # List of all images on site
-    r = requests.get(url, headers=header)
-    soup = bs(r.content, "html.parser")
-    for img in soup.find_all('img'):
-        urls.append(img.get('src'))
-    urls
+
+
         
 # Formatting page to display metrics
 col1,col2,col3 = st.columns(3)
@@ -82,29 +70,53 @@ with col2:
     st.title(location)
     st.caption(f"Lat: {choice1}, Long: {choice2}")
 st.header(f"48 Hour Forecast")
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns([2,2,3,3,2])
 
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 def get48hrforecast():
+    
+    # Grab Images using SerpAPI
+    configure()
+    params = {
+    "engine": "google",
+    "q": f"{location} weather",
+    "location": "United Kingdom",
+    "gl": "uk",
+    "api_key": os.getenv('serpkey')
+    }
+
+    search = GoogleSearch(params)
+    results = search.get_dict()
+    ansbox = results["answer_box"]
+
+    #Start Building Metrics Table
     tdate = timeSeries0["time"][:10]
     dof = pd.Timestamp(tdate)
     temp1, temp2, temp3 = timeSeries0["feelsLikeTemp"], timeSeries0["windSpeed10m"], timeSeries0["probOfRain"]
-    col1.metric(days[dof.dayofweek], timeSeries0["time"][11:-1])
-    col2.metric("Temperature", f'{temp1} °C')
-    col3.metric("Windspeed", f'{temp2} mph')
-    col4.metric("Rain Probability", f'{temp3}%')
-    
+    col1.image(ansbox["thumbnail"], width=91)
+    col2.metric(days[dof.dayofweek], timeSeries0["time"][11:-1])
+    col3.metric("Temperature", f'{temp1} °C')
+    col4.metric("Windspeed", f'{temp2} mph')
+    col5.metric("Rain Probability", f'{temp3}%')
+    curday = days[dof.dayofweek]
+    foreday = 0
     for v in alltimeseries[1:16]:
+        tm, t, w, r = v["time"], v["feelsLikeTemp"], v["windSpeed10m"], v["probOfRain"]
         tdate = v["time"][:10]
         dof = pd.Timestamp(tdate)
-        tm, t, w, r = v["time"], v["feelsLikeTemp"], v["windSpeed10m"], v["probOfRain"]
-        col1.metric(days[dof.dayofweek], tm[11:-1], tm[:10], delta_color="off")
-        col2.metric("Temperature", f'{t} °C', f"{round(t - temp1, 2)} °C" )
-        col3.metric("Windspeed", f'{w} mph', f"{round(w - temp2, 2)} mph")
-        col4.metric("Rain Probability", f'{r}%', f"{round(r - temp3, 2)} %")
+        if days[dof.dayofweek] == curday: # If still on todays date show todays forecast image
+            col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
+        else: # If date does not match todays date, move to next forecast image
+            curday = days[dof.dayofweek]
+            foreday += 1
+            col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
+        
+        col2.metric(days[dof.dayofweek], tm[11:-1], tm[:10], delta_color="off")
+        col3.metric("Temperature", f'{t} °C', f"{round(t - temp1, 2)} °C" )
+        col4.metric("Windspeed", f'{w} mph', f"{round(w - temp2, 2)} mph")
+        col5.metric("Rain Probability", f'{r}%', f"{round(r - temp3, 2)} %")
         temp1, temp2, temp3 = t, w, r
+
         
 get48hrforecast()
-
-scrapeimage()
