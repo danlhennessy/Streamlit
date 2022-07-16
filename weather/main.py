@@ -37,7 +37,10 @@ def getweather(lat, long):
 st.title("Weather Dashboard")
 
 # Sidebar
-st.sidebar.markdown("""Pulling Info from Met Office Weather Datahub service via API and webpage using BeautifulSoup module. https://www.metoffice.gov.uk/services/data/met-office-weather-datahub
+st.sidebar.markdown("""Pulling Info from Met Office Weather Datahub service  
+                    https://www.metoffice.gov.uk/services/data/met-office-weather-datahub  
+                    And Google Search data using SerpApi     
+                    https://serpapi.com
 """)
 check = st.sidebar.checkbox("Use Custom Latitude/Longitude")
 
@@ -61,15 +64,31 @@ location = data["features"][0]["properties"]["location"]["name"]
 timeSeries0 = data["features"][0]["properties"]["timeSeries"][0]
 alltimeseries = data["features"][0]["properties"]["timeSeries"]
 
+tdate = alltimeseries[1]["time"][:10]
+#24 Hour Temperature graph
 
+def graphtemp():
+    date = []
+    temp = []
+    for v in alltimeseries[1:10]:
+        date.append(v["time"][:-1])
+        temp.append(v["feelsLikeTemp"])    
+    df = pd.DataFrame({"Temperature  °C" : temp}, index=date)
+    df.index = pd.to_datetime(df.index)
+    return df
 
-        
-# Formatting page to display metrics
+# Metrics Title  
+
 col1,col2,col3 = st.columns(3)
 with col2:
     st.title(location)
     st.caption(f"Lat: {choice1}, Long: {choice2}")
+with st.expander(f"24 Hour Temperature Chart - {tdate}"):
+    st.line_chart(graphtemp())
 st.header(f"48 Hour Forecast")
+
+# Formatting page to display metrics
+
 col1, col2, col3, col4, col5 = st.columns([2,2,3,3,2])
 
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -88,13 +107,17 @@ def get48hrforecast():
 
     search = GoogleSearch(params)
     results = search.get_dict()
-    ansbox = results["answer_box"]
+    if "answer_box" in results:
+        ansbox = results["answer_box"]
+    else:
+        ansbox = None
 
     #Start Building Metrics Table
     tdate = timeSeries0["time"][:10]
     dof = pd.Timestamp(tdate)
     temp1, temp2, temp3 = timeSeries0["feelsLikeTemp"], timeSeries0["windSpeed10m"], timeSeries0["probOfRain"]
-    col1.image(ansbox["thumbnail"], width=91)
+    if ansbox is not None:
+        col1.image(ansbox["thumbnail"], width=91)
     col2.metric(days[dof.dayofweek], timeSeries0["time"][11:-1])
     col3.metric("Temperature", f'{temp1} °C')
     col4.metric("Windspeed", f'{temp2} mph')
@@ -105,12 +128,13 @@ def get48hrforecast():
         tm, t, w, r = v["time"], v["feelsLikeTemp"], v["windSpeed10m"], v["probOfRain"]
         tdate = v["time"][:10]
         dof = pd.Timestamp(tdate)
-        if days[dof.dayofweek] == curday: # If still on todays date show todays forecast image
-            col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
-        else: # If date does not match todays date, move to next forecast image
-            curday = days[dof.dayofweek]
-            foreday += 1
-            col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
+        if ansbox:
+            if days[dof.dayofweek] == curday: # If still on todays date show todays forecast image
+                col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
+            else: # If date does not match todays date, move to next forecast image
+                curday = days[dof.dayofweek]
+                foreday += 1
+                col1.image(ansbox["forecast"][foreday]["thumbnail"], width=91)
         
         col2.metric(days[dof.dayofweek], tm[11:-1], tm[:10], delta_color="off")
         col3.metric("Temperature", f'{t} °C', f"{round(t - temp1, 2)} °C" )
