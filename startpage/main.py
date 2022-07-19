@@ -19,7 +19,7 @@ class outgoing:
 totalin = incoming(0)
 totalout = outgoing(0)
 
-def listout(newout):
+def listout(newout): # Function for adding new outgoings to list
     temp = np.append(outgoings, newout)
     return temp
 
@@ -32,8 +32,8 @@ class subin(incoming):
         super().__init__(value)
         self.type = type
         totalin.value += self.value
-        global incomings # Bring in global incomings variable
-        incomings = listin(self) # Append new income object to np array ('incomings')
+        global incomings # Bring in global variable incomings 
+        incomings = listin(self) # When a new object is created, call the listin function to update global var incomings
     
     def adjust(self, newval):
         totalin.value += (newval - self.value)
