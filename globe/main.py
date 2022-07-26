@@ -3,18 +3,23 @@ import http.client
 import json
 import pandas as pd
 import plotly.express as px
-import streamlit as st
+from dotenv import load_dotenv
+import os
+
+def configure():
+    load_dotenv()
 
 with urlopen('https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Counties_December_2021_EN_BFC/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson') as response:
     counties = json.load(response)
     
 #Grabs temp from met API:
 def getweather(lat, long):
+    configure()
     conn = http.client.HTTPSConnection("api-metoffice.apiconnect.ibmcloud.com")
 
     headers = {
-        'X-IBM-Client-Id': st.secrets['api_key'], #Replace secret before github push
-        'X-IBM-Client-Secret': st.secrets['api_secret'], #Replace secret before github push
+        'X-IBM-Client-Id': os.getenv('api_key'), #Replace secret before github push
+        'X-IBM-Client-Secret': os.getenv('api_secret'), #Replace secret before github push
         'accept': "application/json"
         }
 
