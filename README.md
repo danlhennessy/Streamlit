@@ -1,6 +1,6 @@
 Streamlit mini Projects and Apps
 
-Project example: UK County Temperature Chloropleth Map: 
+Project example: UK County Temperature Choropleth Map: 
 
 ![Alt text](/globe/example.png?raw=true "Title")
 
