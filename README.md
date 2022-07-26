@@ -1,5 +1,5 @@
-Data Science Projects and Apps
+Streamlit mini Projects and Apps
 
-Some deployed on Streamlit for visuals, some kept as local tools.
+Project example: UK County Temperature Chloropleth Map: 
 
-UK County Temperature Chloropleth Map: ![Alt text](/globe/example.png?raw=true "Title")
+![Alt text](/globe/example.png?raw=true "Title")
