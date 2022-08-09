@@ -2,4 +2,8 @@ import numpy as np
 import pandas as pd
 import scipy
 
-print(scipy.__version__)
+
+# Data from http://old.openpowerlifting.org/data.html
+
+df = pd.read_csv('correlation\entries.csv')
+print(df)
