@@ -32,8 +32,9 @@ pearson, spearman, kendalltau = scipy.stats.pearsonr(ages, lifts), scipy.stats.s
 fig = px.scatter(deadlift_ninety, x='Age', y='Deadlift 1RM (kg)', trendline="lowess", trendline_color_override="red")
 st.plotly_chart(fig)
 
+# Show Coefficients
 st.write(f"""Coefficients:\n 
-        Pearson = {pearson[0]}\n
-    Spearman = {spearman[0]}\n
-    Kendalltau = {kendalltau[0]}
+        Pearson's r = {pearson[0]}\n
+    Spearman's rho = {spearman[0]}\n
+    Kendall's tau = {kendalltau[0]}
     """)
