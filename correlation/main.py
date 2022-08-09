@@ -17,5 +17,5 @@ deadlift_ninety = weightclass_ninety[['Age', 'Best3DeadliftKg']].dropna(axis=0)
 deadlift_ninety['Best3DeadliftKg'] = deadlift_ninety['Best3DeadliftKg'].abs()
 deadlift_ninety.rename(columns={'Best3DeadliftKg': 'Deadlift 1RM (kg)'}, inplace=True)
 
-fig = px.scatter(deadlift_ninety, x='Age', y='Deadlift 1RM (kg)')
+fig = px.scatter(deadlift_ninety, x='Age', y='Deadlift 1RM (kg)', trendline="lowess", trendline_color_override="red")
 st.plotly_chart(fig)
