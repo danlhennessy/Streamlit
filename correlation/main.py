@@ -4,10 +4,11 @@ import scipy.stats
 import streamlit as st
 import plotly.express as px
 
-st.title("Age/Strength correlation in powerlifting")
-st.header(" ")
 
-# Data from http://old.openpowerlifting.org/data.html
+st.title("Age/Strength correlation in Powerlifting")
+st.write("Data source: http://old.openpowerlifting.org/data.html")
+    
+st.header(" ")
 
 df = pd.read_csv('D:\Backup\Work\DevOps\Programming\Streamlit\correlation\entries.csv')
 
@@ -32,9 +33,12 @@ pearson, spearman, kendalltau = scipy.stats.pearsonr(ages, lifts), scipy.stats.s
 fig = px.scatter(deadlift_ninety, x='Age', y='Deadlift 1RM (kg)', trendline="lowess", trendline_color_override="red")
 st.plotly_chart(fig)
 
-# Show Coefficients
 st.write(f"""Coefficients:\n 
-        Pearson's r = {pearson[0]}\n
+    Pearson's r = {pearson[0]}\n
     Spearman's rho = {spearman[0]}\n
     Kendall's tau = {kendalltau[0]}
     """)
+
+
+    
+    
